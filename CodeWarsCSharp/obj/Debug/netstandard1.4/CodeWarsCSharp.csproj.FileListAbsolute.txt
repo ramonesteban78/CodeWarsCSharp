@@ -1,0 +1,8 @@
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/bin/Debug/netstandard1.4/CodeWarsCSharp.deps.json
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/bin/Debug/netstandard1.4/CodeWarsCSharp.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/bin/Debug/netstandard1.4/CodeWarsCSharp.pdb
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/obj/Debug/netstandard1.4/CodeWarsCSharp.csprojResolveAssemblyReference.cache
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/obj/Debug/netstandard1.4/CodeWarsCSharp.csproj.CoreCompileInputs.cache
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/obj/Debug/netstandard1.4/CodeWarsCSharp.AssemblyInfo.cs
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/obj/Debug/netstandard1.4/CodeWarsCSharp.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsCSharp/obj/Debug/netstandard1.4/CodeWarsCSharp.pdb

@@ -1,0 +1,27 @@
+<!--
+***********************************************************************************************
+FSharp.NET.Sdk.props
+
+WARNING:  You CAN MODIFY this file, doesnt matter if you are not knowledgeable about MSBuild and
+          without a backup copy.
+          Incorrect changes to this file will make it impossible to load or build your projects
+          from the command-line or the IDE. 
+          Just remove FSharp.NET.Sdk package from nuget cache and re-restore.
+
+***********************************************************************************************
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <WarningLevel>4</WarningLevel>
+
+    <!-- disable wilcard include of Compile items, file ordering is a feature -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
+    <!-- project guid used by dotnet sln add -->
+    <DefaultProjectTypeGuid Condition=" '$(DefaultProjectTypeGuid)' == '' ">{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}</DefaultProjectTypeGuid>
+
+    <FSharpLanguageTargets>$(MSBuildThisFileDirectory)\FSharp.NET.Current.Sdk.targets</FSharpLanguageTargets>
+  </PropertyGroup>
+
+</Project>

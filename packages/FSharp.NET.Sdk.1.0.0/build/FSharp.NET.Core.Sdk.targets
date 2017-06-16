@@ -1,0 +1,172 @@
+﻿<!--
+***********************************************************************************************
+FSharp.NET.Core.Sdk.targets
+
+WARNING:  You CAN MODIFY this file, doesnt matter if you are not knowledgeable about MSBuild and
+          without a backup copy.
+          Incorrect changes to this file will make it impossible to load or build your projects
+          from the command-line or the IDE. 
+          Just remove FSharp.NET.Sdk package from nuget cache and re-restore.
+
+This file defines the steps in the standard build process specific for F# .NET projects.
+For example, it contains the step that actually calls the F# compiler. 
+Flow is: msbuild -> CoreCompile -> FscTask -> fsc compiler
+The remainder of the build process is defined in Microsoft.Common.targets, but is not imported by 
+this file.
+
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!--TODO error if FscTaskAssemblyPath is not defined-->
+    <UsingTask TaskName="Fsc" AssemblyFile="$(FscTaskAssemblyPath)" />
+
+    <PropertyGroup>
+        <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+        <DefaultLanguageSourceExtension>.fs</DefaultLanguageSourceExtension>
+        <Language>F#</Language>
+        <TargetRuntime>Managed</TargetRuntime>
+        <AlwaysUseNumericalSuffixInItemNames>true</AlwaysUseNumericalSuffixInItemNames>
+        <DefineCommonItemSchemas Condition=" '$(DefineCommonItemSchemas)' == '' ">true</DefineCommonItemSchemas>
+        <DefineCommonReferenceSchemas Condition=" '$(DefineCommonReferenceSchemas)' == '' ">true</DefineCommonReferenceSchemas>
+        <DefineCommonCapabilities Condition=" '$(DefineCommonCapabilities)' == '' ">true</DefineCommonCapabilities>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <DocFileItem Include="$(DocumentationFile)" Condition="'$(DocumentationFile)'!=''"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(_DebugSymbolsProduced)' == 'true' and '$(PdbFile)' != ''">
+        <_DebugSymbolsIntermediatePathTemporary Include="$(PdbFile)"/>
+        <!-- Add any missing .pdb extension, as the compiler does -->
+        <_DebugSymbolsIntermediatePath Include="@(_DebugSymbolsIntermediatePathTemporary->'%(RootDir)%(Directory)%(Filename).pdb')"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <CoreCompileDependsOn>_ComputeNonExistentFileProperty</CoreCompileDependsOn>
+    </PropertyGroup>
+ 
+    <!-- Locate and add mscorlib, unless NoStdLib is set -->
+    <ItemGroup Condition=" '$(NoStdLib)' != 'true' ">
+        <_ExplicitReference Include="$(FrameworkPathOverride)\mscorlib.dll" />
+    </ItemGroup>
+
+    <!--Required Tasks by .Common.target-->
+
+    <PropertyGroup>
+        <CreateManifestResourceNamesDependsOn></CreateManifestResourceNamesDependsOn>
+    </PropertyGroup>
+    <Target
+        Name="CreateManifestResourceNames"
+        Condition="'@(EmbeddedResource)' != ''"
+        DependsOnTargets="$(CreateManifestResourceNamesDependsOn)"
+        >
+
+        <Message Text="Prova CreateManifestResourceNames" />
+    </Target>
+
+  <Target
+          Name="CoreCompile"
+          Inputs="$(MSBuildAllProjects);
+                @(Compile);
+                @(_CoreCompileResourceInputs);
+                $(ApplicationIcon);
+                $(AssemblyOriginatorKeyFile);
+                @(ReferencePath);
+                @(CompiledLicenseFile);
+                @(LinkResource);
+                @(EmbeddedDocumentation);
+                $(Win32Resource);
+                $(Win32Manifest);
+                @(CustomAdditionalCompileInputs);
+                $(ResolvedCodeAnalysisRuleSet);
+                @(AdditionalFiles);
+                @(EmbeddedFiles)"
+          Outputs="@(DocFileItem);
+                 @(IntermediateAssembly);
+                 @(_DebugSymbolsIntermediatePath);
+                 $(NonExistentFile);
+                 @(CustomAdditionalCompileOutputs)"
+          Returns="@(FscCommandLineArgs)"
+          DependsOnTargets="$(CoreCompileDependsOn)"
+    >
+
+        <PropertyGroup>
+            <TargetProfile Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' " >mscorlib</TargetProfile>
+            <TargetProfile Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' " >netcore</TargetProfile>
+
+            <_OtherFscFlags>--simpleresolution --nocopyfsharpcore</_OtherFscFlags>
+
+            <!-- ref https://github.com/Microsoft/msbuild/issues/1669
+                 the dotnet in PATH can be different from the dotnet who run msbuild,
+                 so i need to specify the full path. -->
+            <_DotNetHostExecutableName>dotnet</_DotNetHostExecutableName>
+            <_DotNetHostExecutableName Condition=" '$(OS)' == 'Windows_NT' ">$(_DotNetHostExecutableName).exe</_DotNetHostExecutableName>
+            <_DotNetHostExecutableDirectory>$(MSBuildExtensionsPath)/../..</_DotNetHostExecutableDirectory>
+            <_DotNetHostExecutablePath>$(_DotNetHostExecutableDirectory)/$(_DotNetHostExecutableName)</_DotNetHostExecutablePath>
+        </PropertyGroup>
+
+        <PropertyGroup Condition=" '$(DontRunFscWithDotnet)' == '' ">
+            <_FscTask_FscToolExe>$(_DotNetHostExecutableName)</_FscTask_FscToolExe>
+            <_FscTask_FscToolPath>$(_DotNetHostExecutableDirectory)</_FscTask_FscToolPath>
+            <_FscTask_DotnetFscCompilerPath> "$(FscToolPath)/$(FscToolExe)"</_FscTask_DotnetFscCompilerPath>
+        </PropertyGroup>
+
+        <PropertyGroup Condition=" '$(DontRunFscWithDotnet)' != '' "> <!-- check fsc extension? -->
+            <_FscTask_FscToolExe>$(FscToolExe)</_FscTask_FscToolExe>
+            <_FscTask_FscToolPath>$(FscToolPath)</_FscTask_FscToolPath>
+            <_FscTask_DotnetFscCompilerPath></_FscTask_DotnetFscCompilerPath>
+        </PropertyGroup>
+
+        <Fsc  BaseAddress="$(BaseAddress)"
+              CodePage="$(CodePage)"
+              DebugSymbols="$(DebugSymbols)"
+              DebugType="$(DebugType)"
+              DefineConstants="$(DefineConstants)"
+              DisabledWarnings="$(NoWarn)"
+              DocumentationFile="$(DocumentationFile)"
+              EmbedAllSources="$(EmbedAllSources)"
+              Embed="$(Embed)"
+              GenerateInterfaceFile="$(GenerateInterfaceFile)"
+              KeyFile="$(KeyOriginatorFile)"
+              LCID="$(LCID)"
+              NoFramework="true"
+              Optimize="$(Optimize)"
+              OtherFlags="$(_OtherFscFlags) $(OtherFlags)"
+              OutputAssembly="@(IntermediateAssembly)"
+              PdbFile="$(PdbFile)"
+              Platform="$(PlatformTarget)"
+              Prefer32Bit="$(Actual32Bit)"
+              References="@(ReferencePath)"
+              ReferencePath="$(ReferencePath)"
+              Resources="@(_CoreCompileResourceInputs);@(CompiledLicenseFile);@(AdditionalEmbeddedResource)"
+              SourceLink="$(SourceLink)"
+              Sources="@(CompileBefore -> '%(FullPath)');@(Compile -> '%(FullPath)');@(CompileAfter -> '%(FullPath)')"
+              Tailcalls="$(Tailcalls)"
+              TargetType="$(OutputType)"
+              ToolExe="$(_FscTask_FscToolExe)"
+              ToolPath="$(_FscTask_FscToolPath)"
+              TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+              Utf8Output="$(Utf8Output)"
+              VersionFile="$(VersionFile)"
+              VisualStudioStyleErrors="$(VisualStudioStyleErrors)"
+              WarningLevel="$(WarningLevel)"
+              WarningsAsErrors="$(WarningsAsErrors)"
+              Win32ManifestFile="$(Win32Manifest)"
+              Win32ResourceFile="$(Win32Resource)"
+              SubsystemVersion="$(SubsystemVersion)"
+              HighEntropyVA="$(HighEntropyVA)"
+              TargetProfile="$(TargetProfile)"
+              DotnetFscCompilerPath="$(_FscTask_DotnetFscCompilerPath)"
+        />
+
+    </Target>
+
+    <!--End Required Task by .Common.target-->
+
+    <PropertyGroup Condition="$(MSBuildProjectFullPath.EndsWith('.fsproj')) == 'true' AND '$(PackProjectInputFile)' == ''">
+      <PackProjectInputFile>$(MSBuildProjectFullPath)</PackProjectInputFile>
+    </PropertyGroup>    
+
+</Project>

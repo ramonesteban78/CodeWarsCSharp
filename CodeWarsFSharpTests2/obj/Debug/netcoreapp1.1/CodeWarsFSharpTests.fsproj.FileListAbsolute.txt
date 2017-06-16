@@ -1,0 +1,11 @@
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/xunit.runner.utility.netstandard15.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/xunit.runner.reporters.netstandard15.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/CodeWarsFSharpTests.deps.json
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/CodeWarsFSharpTests.runtimeconfig.json
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/CodeWarsFSharpTests.runtimeconfig.dev.json
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/CodeWarsFSharpTests.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/bin/Debug/netcoreapp1.1/CodeWarsFSharp.dll
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/obj/Debug/netcoreapp1.1/CodeWarsFSharpTests.fsprojResolveAssemblyReference.cache
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/obj/Debug/netcoreapp1.1/CodeWarsFSharpTests.fsproj.CoreCompileInputs.cache
+/Users/Bravent/Projects/CodeWarsCSharp/CodeWarsFSharpTests2/obj/Debug/netcoreapp1.1/CodeWarsFSharpTests.dll

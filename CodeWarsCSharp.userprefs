@@ -1,0 +1,18 @@
+﻿<Properties StartupConfiguration="{0C6363EC-03B0-4163-9BBB-7ACE00A5610B}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="README.md">
+    <Files>
+      <File FileName="CodeWarsFSharpTests2/Tests.fs" Line="7" Column="1" />
+      <File FileName="CodeWarsCSharp/AreTheSame.cs" Line="31" Column="1" />
+      <File FileName="CodeWarsFSharp/Library.fs" Line="3" Column="1" />
+      <File FileName="CodeWarsCSharpTests2/Tests.cs" Line="10" Column="1" />
+      <File FileName="README.md" Line="1" Column="4" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.CodeWarsFSharpTests PreferredExecutionTarget="MonoDevelop.Default" />
+  <MultiItemStartupConfigurations />
+</Properties>

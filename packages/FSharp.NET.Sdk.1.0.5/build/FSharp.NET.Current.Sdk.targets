@@ -1,0 +1,102 @@
+<!--
+***********************************************************************************************
+FSharp.NET.Sdk.targets
+
+WARNING:  You CAN MODIFY this file, doesnt matter if you are not knowledgeable about MSBuild and
+          without a backup copy.
+          Incorrect changes to this file will make it impossible to load or build your projects
+          from the command-line or the IDE. 
+          Just remove FSharp.NET.Sdk package from nuget cache and re-restore.
+
+This file choose the build process specific for F# .NET projects.
+
+If MSBuildAssemblyVersion is set, is the new msbuild 15.
+If TargetFrameworks (plural) is set, that mean is a cross targeting build (multiple frameworks)
+ 
+Atm using legacy msbuild scripts ( $(MSBuildAssemblyVersion)' == '' ) is not supported.
+
+For new msbuild:
+
+if IsCrossTargetingBuild than just import 'Microsoft.Common.CrossTargeting.targets' who will
+run CoreCompile multiple times, each time passing the current TargetFramework (singular).
+
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+   <!-- 
+        We are doing a cross-targeting build if there is no list of target frameworks specified
+        nor is there a current target framework being built individually. In that case, this import is
+        redirected to Microsoft.Common.CrossTargeting.targets.
+   -->
+    <PropertyGroup Condition=" '$(TargetFrameworks)' != '' and '$(TargetFramework)' == '' ">
+        <IsCrossTargetingBuild>true</IsCrossTargetingBuild>
+    </PropertyGroup>
+
+   <!--
+        In VS 2010 SP1 and VS 2012, both supported for asset compatibility, the MSBuild installed 
+        as part of them did not enforce using the local ToolsVersion (4.0) in all cases, but instead 
+        just used whatever ToolsVersion was in the project file if it existed on the machine, and 
+        only forced 4.0 if that ToolsVersion did not exist.  
+
+        Moving forward, we do want to enforce a single acting ToolsVersion per version of Visual Studio, 
+        but in order to approximate this behavior on VS 2010 SP1 and VS 2012 as well, we've redirected 
+        the targets:  If we're building using 4.X MSBuild (which doesn't define the new reserved 
+        property, MSBuildAssemblyVersion), we'll point right back at the 4.0 targets, which still exist 
+        as part of the .NET Framework.  Only if we're using the new MSBuild will we point to the current
+        targets. 
+   -->
+
+   <Choose>
+      <When Condition="'$(MSBuildAssemblyVersion)' == ''">
+         <PropertyGroup>
+            <!-- TODO run legacy build msbuild script, not supported yet -->
+            <FSharpTargetsPath>$(MSBuildFrameworkToolsPath)\Microsoft.FSharp.targets</FSharpTargetsPath>
+         </PropertyGroup>
+      </When>
+      <!--<When Condition="'$(IsCrossTargetingBuild)' == 'true'">
+         <PropertyGroup>-->
+            <!-- import directly the common.crosstargeting because there is nothing else todo -->
+            <!--<FSharpTargetsPath>$(MSBuildToolsPath)\Microsoft.Common.CrossTargeting.targets</FSharpTargetsPath>
+          </PropertyGroup>
+      </When>-->
+      <Otherwise>
+         <PropertyGroup>
+            <FSharpTargetsPath>$(MSBuildThisFileDirectory)\FSharp.NET.Core.Sdk.targets</FSharpTargetsPath>
+         </PropertyGroup>
+      </Otherwise>
+   </Choose>
+
+    <PropertyGroup Condition="'$(DisableImplicitConfigurationDefines)' != 'true'">
+        <ImplicitConfigurationDefine>$(Configuration.ToUpperInvariant())</ImplicitConfigurationDefine>
+        
+        <!-- Replace dashes and periods in the configuration with underscores.  This makes it more likely that
+            the resulting compilation constant will be a valid C# conditional compilation symbol.  As the set
+            of characters that aren't allowed is essentially open-ended, there's probably not a good way to
+            fully sanitize the Configuration in MSBuild evaluation.  If the resulting string still isn't a
+            valid conditional combilation symbol, then the compiler will generate the following error and
+            the define will be ignored:
+                warning MSB3052: The parameter to the compiler is invalid, '/define:0BAD_DEFINE' will be ignored.
+            -->
+        
+        <ImplicitConfigurationDefine>$(ImplicitConfigurationDefine.Replace('-', '_'))</ImplicitConfigurationDefine>
+        <ImplicitConfigurationDefine>$(ImplicitConfigurationDefine.Replace('.', '_'))</ImplicitConfigurationDefine>
+        <DefineConstants>$(DefineConstants);$(ImplicitConfigurationDefine)</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants);$(ImplicitFrameworkDefine)</DefineConstants>
+    </PropertyGroup>
+
+    <Import Project="$(FSharpTargetsPath)" />
+
+    <!-- Import design time targets for Roslyn Project System. These are only available if Visual Studio is installed. -->
+    <!-- Import design time targets before the common targets, which import targets from Nuget. -->
+    <PropertyGroup>
+        <FSharpDesignTimeTargetsPath Condition="'$(FSharpDesignTimeTargetsPath)'==''">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\Managed\Microsoft.FSharp.DesignTime.targets</FSharpDesignTimeTargetsPath>
+    </PropertyGroup>
+    <Import Project="$(FSharpDesignTimeTargetsPath)" Condition="'$(FSharpDesignTimeTargetsPath)' != '' and Exists('$(FSharpDesignTimeTargetsPath)')" />
+
+    <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+
+</Project>
